@@ -7,3 +7,6 @@ Much of it is inspired by
 http://en.wikibooks.org/wiki/Fortran (slightly incomplete)
 and
 http://de.wikibooks.org/wiki/Fortran (very good, but in German)
+
+@kfubuki notes on FORTRAN, regularly updated: 
+https://gist.github.com/KFubuki/0864aaec029c887a3e47
