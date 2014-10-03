@@ -1,0 +1,20 @@
+#All extensionless files (i.e. executables)
+# http://stackoverflow.com/questions/19023550/how-do-i-add-files-without-dots-in-them-all-extension-less-files-to-the-gitign
+*
+!*.*
+
+# Compiled object files
+*.[oa]
+
+# Editor backup files
+*~
+\#*\#
+
+# Common OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
