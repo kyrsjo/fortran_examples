@@ -1,7 +1,8 @@
 #All extensionless files (i.e. executables)
 # http://stackoverflow.com/questions/19023550/how-do-i-add-files-without-dots-in-them-all-extension-less-files-to-the-gitign
-*
-!*.*
+# *
+# !*.*
+#didn't work very well..
 
 # Compiled object files
 *.[oa]
