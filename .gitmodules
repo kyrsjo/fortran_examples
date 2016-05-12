@@ -1,0 +1,3 @@
+[submodule "linkingC/libarchiveTest/libarchive"]
+	path = linkingC/libarchiveTest/libarchive
+	url = git@github.com:libarchive/libarchive.git

@@ -1,0 +1,5 @@
+The LibArchive library is downloaded as a submodule.
+In order to get it, run "git submodule init" after cloning.
+
+See also:
+https://git-scm.com/book/en/v2/Git-Tools-Submodules
