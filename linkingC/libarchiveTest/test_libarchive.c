@@ -24,21 +24,24 @@ void write_archive(const char *outname, char **filename, int nFiles) {
   a = archive_write_new();
   archive_write_add_filter_gzip(a);
   archive_write_set_format_pax_restricted(a); // Note 1
-  //archive_write_open_filename(a, outname, 10240);
+
   archive_write_open_filename(a, outname);
-  //while (*filename) {
+  entry = archive_entry_new();
   for (int i=0;i<nFiles;i++){
     printf("Counter=%i\n",counter++);
     printf("Compressing filename='%s'\n",filename[i]);
+
+    //Write the header
     statErr = stat(filename[i], &st);
-    printf("statErr=%i\n",statErr);
-    
-    entry = archive_entry_new(); // Note 2
+    printf("statErr=%i\n", statErr);
+    if(statErr != 0) continue;
     archive_entry_set_pathname(entry, filename[i]);
     archive_entry_set_size(entry, st.st_size); // Note 3
     archive_entry_set_filetype(entry, AE_IFREG);
     archive_entry_set_perm(entry, 0644);
     archive_write_header(a, entry);
+
+    //
     fd = open(filename[i], O_RDONLY);
     len = read(fd, buff, sizeof(buff));
     while ( len > 0 ) {
@@ -46,11 +49,11 @@ void write_archive(const char *outname, char **filename, int nFiles) {
         len = read(fd, buff, sizeof(buff));
     }
     close(fd);
-    archive_entry_free(entry);
-    printf("\n");
-    
+    archive_entry_clear(entry);
+    printf("\n"); 
   }
-  printf("Complete!");
+  archive_entry_free(entry);
+  printf("Complete!\n");
   archive_write_close(a); // Note 4
   archive_write_free(a); // Note 5
 }
@@ -59,15 +62,20 @@ void write_archive(const char *outname, char **filename, int nFiles) {
 int main(int argc, char** argv){
   char** filesToCompress;
   const size_t strlen = 32;
-  filesToCompress = malloc(3*sizeof(char*));
+  const size_t numStrings = 4;
+  filesToCompress = malloc(4*sizeof(char*));
+  
   filesToCompress[0]=calloc(strlen,sizeof(char));
   strncpy(filesToCompress[0],"README",strlen);
   filesToCompress[1]=calloc(strlen,sizeof(char));
   strncpy(filesToCompress[1],"buildTest.sh",strlen);
   filesToCompress[2]=calloc(strlen,sizeof(char));
   strncpy(filesToCompress[2],"buildLibArchive.sh",strlen);
+  filesToCompress[3]=calloc(strlen,sizeof(char));
+  strncpy(filesToCompress[3],"noFile",strlen);
 
-  write_archive("test.tgz",filesToCompress,3);
+  
+  write_archive("test.tgz",filesToCompress,numStrings);
 
   free(filesToCompress[0]);
   free(filesToCompress[1]);
