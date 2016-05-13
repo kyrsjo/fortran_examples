@@ -20,8 +20,11 @@ void write_archive(const char *outname, char **filename, int nFiles) {
   printf("Writing outname='%s'\n\n",outname);
   
   a = archive_write_new();
-  archive_write_add_filter_gzip(a);
-  archive_write_set_format_pax_restricted(a); // Note 1
+  //For tar.gz:
+  // archive_write_add_filter_gzip(a);
+  // archive_write_set_format_pax_restricted(a); // Note 1
+  //For .zip:
+  archive_write_set_format_zip(a);
 
   archive_write_open_filename(a, outname);
   entry = archive_entry_new();
@@ -72,7 +75,8 @@ int main(int argc, char** argv){
   strncpy(filesToCompress[3],"noFile",strlen);
 
   
-  write_archive("test.tgz",filesToCompress,numStrings);
+  //write_archive("test.tgz",filesToCompress,numStrings);
+  write_archive("test.zip",filesToCompress,numStrings);
 
   free(filesToCompress[0]);
   free(filesToCompress[1]);
