@@ -16,10 +16,8 @@ void write_archive(const char *outname, char **filename, int nFiles) {
   char buff[8192];
   int len;
   int fd;
-
-  int counter = 0;
   
-  printf("Writing outname='%s'\n",outname);
+  printf("Writing outname='%s'\n\n",outname);
   
   a = archive_write_new();
   archive_write_add_filter_gzip(a);
@@ -28,20 +26,19 @@ void write_archive(const char *outname, char **filename, int nFiles) {
   archive_write_open_filename(a, outname);
   entry = archive_entry_new();
   for (int i=0;i<nFiles;i++){
-    printf("Counter=%i\n",counter++);
-    printf("Compressing filename='%s'\n",filename[i]);
+    printf("Compressing filename='%s'... ",filename[i]);
 
     //Write the header
-    statErr = stat(filename[i], &st);
-    printf("statErr=%i\n", statErr);
+    statErr = stat(filename[i], &st); // POSIX only, use GetFileSizeEx on Windows.
+    printf("statErr=%i\n\n", statErr);
     if(statErr != 0) continue;
     archive_entry_set_pathname(entry, filename[i]);
-    archive_entry_set_size(entry, st.st_size); // Note 3
+    archive_entry_set_size(entry, st.st_size);
     archive_entry_set_filetype(entry, AE_IFREG);
     archive_entry_set_perm(entry, 0644);
     archive_write_header(a, entry);
 
-    //
+    //Write the data
     fd = open(filename[i], O_RDONLY);
     len = read(fd, buff, sizeof(buff));
     while ( len > 0 ) {
@@ -49,8 +46,8 @@ void write_archive(const char *outname, char **filename, int nFiles) {
         len = read(fd, buff, sizeof(buff));
     }
     close(fd);
+    
     archive_entry_clear(entry);
-    printf("\n"); 
   }
   archive_entry_free(entry);
   printf("Complete!\n");
