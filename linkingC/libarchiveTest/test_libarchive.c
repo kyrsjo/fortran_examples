@@ -17,6 +17,7 @@ void write_archive(const char *outname, char **filename, int nFiles) {
   int len;
   int fd;
   
+  
   printf("Writing outname='%s'\n\n",outname);
   
   a = archive_write_new(); //Constructs the archive in memory? If so, may be problematic for large archives.
@@ -60,6 +61,8 @@ void write_archive(const char *outname, char **filename, int nFiles) {
 
 
 int main(int argc, char** argv){
+
+  //List the files to compress
   char** filesToCompress;
   const size_t strlen = 32;
   const size_t numStrings = 4;
@@ -74,10 +77,32 @@ int main(int argc, char** argv){
   filesToCompress[3]=calloc(strlen,sizeof(char));
   strncpy(filesToCompress[3],"noFile",strlen);
 
+  //Create tmpdir folder if neccessary
+  struct stat st;
+  int status;
+  if (stat("tmpdir", &st) != 0) {
+    printf("Creating tmpdir\n");
+    status = mkdir("tmpdir",S_IRWXU);
+    if (status){
+      printf("Something went wrong when creating tmpdir. Sorry!");
+      exit(1);
+    }
+  }
+  else if (stat("tmpdir", &st) == 0 && ! S_ISDIR(st.st_mode)) {
+    printf("tmpdir exists, but is not a directory. You fix it!\n");
+    exit(1);
+  }
   
-  //write_archive("test.tgz",filesToCompress,numStrings);
-  write_archive("test.zip",filesToCompress,numStrings);
+  //Delete old tmp file
+  int un_status = unlink("tmpdir/test.zip"); //Not Windows friendly
+  if (un_status) {
+    printf("Unlink was not a sucess, status=%i -- maybe the file didn't exist? Oh well.\n",un_status);
+  }
 
+  //Create tmp zip file!
+  write_archive("tmpdir/test.zip",filesToCompress,numStrings);
+
+  //Free storage
   free(filesToCompress[0]);
   free(filesToCompress[1]);
   free(filesToCompress[2]);
