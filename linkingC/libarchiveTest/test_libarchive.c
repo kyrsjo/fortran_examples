@@ -6,9 +6,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Adapted from
-//https://github.com/libarchive/libarchive/wiki/Examples#A_Basic_Write_Example
+//********************************************************************************************************
 void write_archive(const char *outname, char **filename, int nFiles) {
+  // Adapted from
+  // https://github.com/libarchive/libarchive/wiki/Examples#A_Basic_Write_Example
   struct archive *a;
   struct archive_entry *entry;
   struct stat st;
@@ -18,7 +19,7 @@ void write_archive(const char *outname, char **filename, int nFiles) {
   int fd;
   
   
-  printf("Writing outname='%s'\n\n",outname);
+  printf("Writing outname='%s'\n",outname);
   
   a = archive_write_new(); //Constructs the archive in memory? If so, may be problematic for large archives.
   //For tar.gz:
@@ -59,7 +60,34 @@ void write_archive(const char *outname, char **filename, int nFiles) {
   archive_write_free(a); // called archive_write_finish() in old versions of libarchive
 }
 
+//********************************************************************************************************
+void list_archive(const char* const inname) {
+  // Adapted from:
+  // https://github.com/libarchive/libarchive/wiki/Examples#List_contents_of_Archive_stored_in_File
+  
+  printf("Opening archive '%s' for listing:\n",inname);
+  
+  struct archive* a = archive_read_new();
+  archive_read_support_format_zip(a);
+  int r = archive_read_open_filename(a, inname,10240);//Note: Blocksize isn't neccessarilly adhered to
+  if (r != ARCHIVE_OK) {
+    printf("Error when opening archive '%s', r=%i\n",inname,r);
+  }
+  
+  struct archive_entry* entry;
+  while (archive_read_next_header(a,&entry)==ARCHIVE_OK){
+    printf("Found file: '%s'\n",archive_entry_pathname(entry));
+    archive_read_data_skip(a);
+  }
+  
+  archive_read_close(a);
+  r = archive_read_free(a);
+  if (r != ARCHIVE_OK){
+    printf("Error when calling archive_read_free(), '%s', r=%i\n",inname,r);
+  }
+}
 
+//********************************************************************************************************
 int main(int argc, char** argv){
 
   //List the files to compress
@@ -95,13 +123,35 @@ int main(int argc, char** argv){
   
   //Delete old tmp file
   int un_status = unlink("tmpdir/test.zip"); //Not Windows friendly
+  printf("Deleting 'tmpdir/test.zip'...\n");
   if (un_status) {
-    printf("Unlink was not a sucess, status=%i -- maybe the file didn't exist? Oh well.\n",un_status);
+    printf("Unlink was not a sucess, status=%i -- maybe the zip file didn't exist? Oh well.\n",un_status);
   }
+  //Delete other files (created by decompression)
 
+  for (int i=0; i<numStrings;i++){
+    char* tmpstr = calloc((strlen+7),sizeof(char));
+    strncat(tmpstr,"tmpdir/",7);
+    strncat(tmpstr,filesToCompress[i],strlen);
+    int un_status = unlink(tmpstr); //Not Windows friendly
+    printf("Deleted '%s', status=%i\n",tmpstr,un_status);
+    free(tmpstr);
+    tmpstr=NULL;
+  }
+  printf("\n");
+
+  
   //Create tmp zip file!
   write_archive("tmpdir/test.zip",filesToCompress,numStrings);
-
+  printf("\n");
+  
+  //List the archive contents
+  list_archive("tmpdir/test.zip");
+  printf("\n");
+  
+  //Unzip it.
+  //read_archive("tmpdir/test.zip")
+  
   //Free storage
   free(filesToCompress[0]);
   free(filesToCompress[1]);
