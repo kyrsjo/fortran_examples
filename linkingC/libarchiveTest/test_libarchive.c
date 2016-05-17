@@ -19,7 +19,7 @@ void write_archive(const char *outname, char **filename, int nFiles) {
   
   printf("Writing outname='%s'\n\n",outname);
   
-  a = archive_write_new();
+  a = archive_write_new(); //Constructs the archive in memory? If so, may be problematic for large archives.
   //For tar.gz:
   // archive_write_add_filter_gzip(a);
   // archive_write_set_format_pax_restricted(a); // Note 1
@@ -55,7 +55,7 @@ void write_archive(const char *outname, char **filename, int nFiles) {
   archive_entry_free(entry);
   printf("Complete!\n");
   archive_write_close(a); // Note 4
-  archive_write_free(a); // Note 5
+  archive_write_free(a); // called archive_write_finish() in old versions of libarchive
 }
 
 
