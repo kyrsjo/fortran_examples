@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 //********************************************************************************************************
 void write_archive(const char *outname, char **filename, int nFiles) {
@@ -66,17 +67,17 @@ void write_archive(const char *outname, char **filename, int nFiles) {
 }
 
 //********************************************************************************************************
-void list_archive(const char* const inname) {
+void list_archive(const char* const infile) {
   // Adapted from:
   // https://github.com/libarchive/libarchive/wiki/Examples#List_contents_of_Archive_stored_in_File
   
-  printf("Opening archive '%s' for listing:\n",inname);
+  printf("Opening archive '%s' for listing...\n",infile);
   
   struct archive* a = archive_read_new();
   archive_read_support_format_zip(a);
-  int r = archive_read_open_filename(a, inname,10240);//Note: Blocksize isn't neccessarilly adhered to
-  if (r != ARCHIVE_OK) {
-    printf("Error when opening archive '%s', r=%i\n",inname,r);
+  int err = archive_read_open_filename(a, infile,10240);//Note: Blocksize isn't neccessarilly adhered to
+  if (err != ARCHIVE_OK) {
+    printf("Error when opening archive '%s', err=%i\n",infile,err);
   }
   
   struct archive_entry* entry;
@@ -86,9 +87,68 @@ void list_archive(const char* const inname) {
   }
   
   archive_read_close(a);
-  r = archive_read_free(a);
-  if (r != ARCHIVE_OK){
-    printf("Error when calling archive_read_free(), '%s', r=%i\n",inname,r);
+  err = archive_read_free(a);
+  if (err != ARCHIVE_OK){
+    printf("Error when calling archive_read_free(), '%s', err=%i\n",infile,err);
+  }
+}
+
+//********************************************************************************************************
+void read_archive(const char* const infile, const char* extractfolder){
+  // Strongly inspired by
+  // https://github.com/libarchive/libarchive/wiki/Examples#A_Complete_Extractor
+  
+  printf("Opening archive '%s' for extracting to folder '%s'...\n",infile,extractfolder);
+
+  //Check that the archive exists
+
+  //Check that the folder exists, if not then create it
+  
+  struct archive* a = archive_read_new();
+  archive_read_support_format_zip(a);
+  struct archive* ext = archive_write_disk_new();
+  archive_write_disk_set_options(ext,ARCHIVE_EXTRACT_TIME|ARCHIVE_EXTRACT_PERM|ARCHIVE_EXTRACT_ACL|ARCHIVE_EXTRACT_FFLAGS);
+  archive_write_disk_set_standard_lookup(ext);
+  
+  int err;
+  err = archive_read_open_filename(a, infile, 10240);
+  if (err != ARCHIVE_OK) {
+    printf("Error opening archive, err=%i\n",err);
+    exit(1);
+  }
+
+  struct archive_entry *entry;
+  
+  const int fcount_max = 1000;
+  char completed=0; //C-Boolean
+  for(int fcount=0; fcount<fcount_max;fcount++){
+    err = archive_read_next_header(a,&entry);
+    if (err == ARCHIVE_EOF){
+      completed=1;
+      break;
+    }
+    else if (err != ARCHIVE_OK){
+      printf("Error when reading archive, err=%i\n",err);
+      printf("%s\n",archive_error_string(a));
+      exit(1);
+    }
+    printf("Found file: '%s'\n",archive_entry_pathname(entry));
+
+    //char newpath[PATH_MAX];
+    
+    
+    //err = archive_write_header(ext, entry); //This will by default clobber the files which are inside the archive...
+    /*
+    if (err != ARCHIVE_OK){
+      printf("Error when extracting archive, err=%i\n",err);
+      printf("%s\n",archive_error_string(ext));
+      exit(1);
+    }
+    */
+  }
+  if (!completed) {
+    printf("Error: The file header loop was aborted by the infinite loop guard\n");
+    exit(1);
   }
 }
 
@@ -155,7 +215,7 @@ int main(int argc, char** argv){
   printf("\n");
   
   //Unzip it.
-  //read_archive("tmpdir/test.zip")
+  read_archive("tmpdir/test.zip", "tmpdir");
   
   //Free storage
   free(filesToCompress[0]);
