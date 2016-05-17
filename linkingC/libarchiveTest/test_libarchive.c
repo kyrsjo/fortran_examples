@@ -13,7 +13,7 @@ void write_archive(const char *outname, char **filename, int nFiles) {
   struct archive *a;
   struct archive_entry *entry;
   struct stat st;
-  int statErr;
+  int err;
   char buff[8192];
   int len;
   int fd;
@@ -34,21 +34,26 @@ void write_archive(const char *outname, char **filename, int nFiles) {
     printf("Compressing filename='%s'... ",filename[i]);
 
     //Write the header
-    statErr = stat(filename[i], &st); // POSIX only, use GetFileSizeEx on Windows.
-    printf("statErr=%i\n", statErr);
-    if(statErr != 0) continue;
+    err = stat(filename[i], &st); // POSIX only, use GetFileSizeEx on Windows.
+    printf("stat reported err=%i\n", err);
+    if(err != 0) continue;
+    
     archive_entry_set_pathname(entry, filename[i]);
     archive_entry_set_size(entry, st.st_size);
     archive_entry_set_filetype(entry, AE_IFREG);
     archive_entry_set_perm(entry, 0644);
     archive_write_header(a, entry);
-
+    
     //Write the data
     fd = open(filename[i], O_RDONLY);
     len = read(fd, buff, sizeof(buff));
     while ( len > 0 ) {
-        archive_write_data(a, buff, len);
-        len = read(fd, buff, sizeof(buff));
+      err=archive_write_data(a, buff, len);
+      if (err < 0){
+	printf("Error when writing file, got err=%i\n",err);
+	exit(1);
+      }
+      len = read(fd, buff, sizeof(buff));
     }
     close(fd);
     
