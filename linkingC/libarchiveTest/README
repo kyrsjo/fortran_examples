@@ -3,3 +3,5 @@ In order to get it, run "git submodule init" after cloning.
 
 See also:
 https://git-scm.com/book/en/v2/Git-Tools-Submodules
+
+To compile, just run the script "builtTest.sh". This will (if neccessary) compile libarchive, and then compile&run the tests (static and dynamic linking).

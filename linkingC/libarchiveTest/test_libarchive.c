@@ -34,7 +34,7 @@ void write_archive(const char *outname, char **filename, int nFiles) {
 
     //Write the header
     statErr = stat(filename[i], &st); // POSIX only, use GetFileSizeEx on Windows.
-    printf("statErr=%i\n\n", statErr);
+    printf("statErr=%i\n", statErr);
     if(statErr != 0) continue;
     archive_entry_set_pathname(entry, filename[i]);
     archive_entry_set_size(entry, st.st_size);
