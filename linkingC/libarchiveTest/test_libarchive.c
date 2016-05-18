@@ -120,11 +120,11 @@ void read_archive(const char* const infile, const char* extractFolder){
   struct archive_entry *entry;
   
   const int fcount_max = 1000;
-  char completed=0; //C-Boolean
+  char fcompleted=0; //C-Boolean
   for(int fcount=0; fcount<fcount_max;fcount++){
     err = archive_read_next_header(a,&entry);
     if (err == ARCHIVE_EOF){
-      completed=1;
+      fcompleted=1;
       break;
     }
     else if (err != ARCHIVE_OK){
@@ -141,15 +141,63 @@ void read_archive(const char* const infile, const char* extractFolder){
     archive_entry_set_pathname(entry,newPath);
     
     err = archive_write_header(ext, entry);
-    
     if (err != ARCHIVE_OK){
-      printf("Error when extracting archive, err=%i\n",err);
+      printf("Error when extracting archive (creating new file), err=%i\n",err);
       printf("%s\n",archive_error_string(ext));
       exit(1);
     }
+
+    //Write the data!
+    const void* buff;
+    size_t size;
+    off_t offset;
     
+    const int bcount_max = 100000000;
+    char bcompleted = 0; //C boolean
+    for (int bcount=0; bcount<bcount_max;bcount++){
+      err = archive_read_data_block(a,&buff,&size, &offset);
+      if ( err == ARCHIVE_EOF ) {
+	bcompleted=1;
+	break;
+      }
+      else if (err != ARCHIVE_OK){
+	printf("Error when extracting archive (reading data), err=%i\n",err);
+	printf("%s\n",archive_error_string(a));
+	exit(1);
+      }
+
+      err = archive_write_data_block(ext,buff,size,offset);
+      if (err != ARCHIVE_OK){
+	printf("Error when extracting archive (writing data), err=%i\n",err);
+	printf("%s\n",archive_error_string(a));
+	exit(1);
+      }
+    }
+    if (!bcompleted){
+      printf("Error: The file writing block loop was aborted by the infinite loop guard\n");
+      exit(1);
+    }
+    
+    err=archive_write_finish_entry(ext);
+    if (err != ARCHIVE_OK) {
+      printf("Error when extracting archive (closing new file), err=%i\n",err);
+      printf("%s\n",archive_error_string(ext));
+      exit(1);
+    }
   }
-  if (!completed) {
+
+  archive_read_close(a);
+  err=archive_read_free(a);
+  if (err != ARCHIVE_OK){
+    printf("Error when calling archive_read_free(a), err=%i\n",err);
+  }
+  archive_write_close(ext);
+  err = archive_write_free(ext);
+  if (err != ARCHIVE_OK){
+    printf("Error when calling archive_read_free(ext), err=%i\n",err);
+  }
+  
+  if (!fcompleted) {
     printf("Error: The file header loop was aborted by the infinite loop guard\n");
     exit(1);
   }
