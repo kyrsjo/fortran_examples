@@ -94,11 +94,11 @@ void list_archive(const char* const infile) {
 }
 
 //********************************************************************************************************
-void read_archive(const char* const infile, const char* extractfolder){
+void read_archive(const char* const infile, const char* extractFolder){
   // Strongly inspired by
   // https://github.com/libarchive/libarchive/wiki/Examples#A_Complete_Extractor
   
-  printf("Opening archive '%s' for extracting to folder '%s'...\n",infile,extractfolder);
+  printf("Opening archive '%s' for extracting to folder '%s'...\n",infile,extractFolder);
 
   //Check that the archive exists
 
@@ -134,17 +134,20 @@ void read_archive(const char* const infile, const char* extractfolder){
     }
     printf("Found file: '%s'\n",archive_entry_pathname(entry));
 
-    //char newpath[PATH_MAX];
+    //Avoid clobbering files in current directory - solution from
+    // http://stackoverflow.com/questions/4496001/libarchive-to-extract-to-a-specified-folder
+    char newPath[PATH_MAX];
+    snprintf(newPath, PATH_MAX, "%s/%s",extractFolder,archive_entry_pathname(entry));
+    archive_entry_set_pathname(entry,newPath);
     
+    err = archive_write_header(ext, entry);
     
-    //err = archive_write_header(ext, entry); //This will by default clobber the files which are inside the archive...
-    /*
     if (err != ARCHIVE_OK){
       printf("Error when extracting archive, err=%i\n",err);
       printf("%s\n",archive_error_string(ext));
       exit(1);
     }
-    */
+    
   }
   if (!completed) {
     printf("Error: The file header loop was aborted by the infinite loop guard\n");
