@@ -42,7 +42,16 @@ C     Read command line arguments
       end subroutine
 
       subroutine WRITE
+      character(32) filenames(4)
+      filenames(1)="README"
+      filenames(2)="buildTest.sh"
+      filenames(3)="buildLibArchive.sh"
+      filenames(4)="noFile"
+      
       write(*,*) "Writing!"
+      FLUSH(6)
+      call f_write_archive("tmpdir/test.zip", filenames,4)
+      
       end subroutine
 
       subroutine LIST

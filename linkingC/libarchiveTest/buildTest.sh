@@ -55,7 +55,7 @@ set +o verbose +o xtrace
 #Build FORTRAN test_libarchive
 echo "Building test_libarchive_fortran_static..."
 set -o verbose -o xtrace
-gfortran -static -Wall -g -cpp test_libarchive.f libArchive_Fwrapper.o libArchive_wrapper.o -Llibarchive_build/libarchive/ -larchive -lz -lpthread -o test_libarchive_fortran_static
+gfortran -static -Wall -g test_libarchive.f libArchive_Fwrapper.o libArchive_wrapper.o -Llibarchive_build/libarchive/ -larchive -lz -lpthread -o test_libarchive_fortran_static
 
 ./test_libarchive_fortran_static W
 ./test_libarchive_fortran_static L

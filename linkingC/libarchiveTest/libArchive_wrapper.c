@@ -8,7 +8,7 @@
 #include "libArchive_wrapper.h"
 
 //********************************************************************************************************
-void write_archive(const char *outname, char **filename, int nFiles) {
+void write_archive(const char* const outname, char** filename, int nFiles) {
   // Adapted from
   // https://github.com/libarchive/libarchive/wiki/Examples#A_Basic_Write_Example
   struct archive *a;
