@@ -5,6 +5,10 @@
 # http://www.yolinux.com/TUTORIALS/LinuxTutorialMixingFortranAndC.html
 # https://software.intel.com/en-us/forums/archived-visual-fortran-read-only/topic/314274
 
+#Echo and expand every command
+set -o verbose
+set -o xtrace
+
 CC=gcc
 FC=gfortran
 
