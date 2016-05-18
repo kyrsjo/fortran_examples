@@ -20,7 +20,7 @@ C     Read command line arguments
       endif
 
       select case (arg(1:1))
-      case ("C")
+      case ("W")
          call WRITE
       case ("L")
          call LIST
@@ -36,19 +36,25 @@ C     Read command line arguments
       subroutine USAGE
          write(*,*) "Expected 1 argument, which is the action to do"
          write(*,*) "Valid actions:"
-         write(*,*) "  C: Create the archive"
+         write(*,*) "  W: Create/write the archive"
          write(*,*) "  L: List the archive"
          write(*,*) "  R: Read the archive"
       end subroutine
 
       subroutine WRITE
-      write(*,*) "Creating!"
+      write(*,*) "Writing!"
       end subroutine
 
       subroutine LIST
       write(*,*) "Listing!"
+      FLUSH(6)
+      call f_list_archive("tmpdir/test.zip")
+      write(*,*) "Done"
       end subroutine
 
       subroutine READ
       write(*,*) "Reading!"
+      FLUSH(6)
+      call f_read_archive("tmpdir/test.zip","tmpdir")
+      write(*,*) "Done"
       end subroutine

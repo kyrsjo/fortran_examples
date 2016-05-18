@@ -113,7 +113,7 @@ void read_archive(const char* const infile, const char* extractFolder){
   int err;
   err = archive_read_open_filename(a, infile, 10240);
   if (err != ARCHIVE_OK) {
-    printf("Error opening archive, err=%i\n",err);
+    printf("Error opening archive '%s', err=%i\n",infile,err);
     exit(1);
   }
 
