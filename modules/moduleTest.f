@@ -1,9 +1,15 @@
       module datashare
       
       !integer, parameter :: N = 100
-      integer, parameter :: N = 600000000 !4.8 Gb
+      integer, parameter :: N = 600000000 !4.8 Gb > data segment limit (and 32-bit limit)
       
       double precision,dimension(N) :: data
+
+      !In case the module is only used in subroutines,
+      ! and at some points none of these are actually running,
+      ! the data in the moldule goes out of scope and un-initialized.
+      ! SAVE prevents this. Note that the same gotcha applies to COMMON blocks!
+      save
       
       end module datashare
       
