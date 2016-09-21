@@ -1,5 +1,15 @@
+      
       program testLink
+      implicit none
 
+      interface
+         real*8 function test_double_double(a)
+         real*8, intent(in) :: a
+         end function test_double_double
+         double precision function test_objgetpi()
+         end function test_objgetpi
+      end interface
+      
       integer n
       real r   !float
       real*8 x !double
@@ -10,8 +20,8 @@
       character(32) str2(5)
       
       !Function definitions (like in a header file), not needed for subroutines.
-      real*8 test_double_double
-      double precision test_objgetpi
+      !real*8 test_double_double
+      !double precision test_objgetpi
       
       write(*,*) "Calling test1:"
       call test_void()
@@ -53,7 +63,7 @@ c$$$      write(*,*) "Calling test_void_double with argument r=3.14:"
 c$$$      r=test_double_double(r)
 c$$$      write(*,*) "Got return",r
       x=3.14
-      write(*,*) "Calling test_void_double with argument x=3.14:"
+      write(*,*) "Calling test_double_double with argument x=3.14:"
       x= test_double_double(x)
       write(*,*) "Got return =",x
 

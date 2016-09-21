@@ -78,9 +78,7 @@ extern "C" double test_objgetpi(){
 #endif
 
   if (!theObj) cout << "Error - does not exists" << endl;
-
   return theObj->getPi();
-  
 }
  
 
