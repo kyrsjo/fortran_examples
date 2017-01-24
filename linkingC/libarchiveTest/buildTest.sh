@@ -23,7 +23,11 @@ echo
 echo "Building test_libarchive_static..."
 set -o verbose -o xtrace
 gcc -Wall -g -c test_libarchive.c
-gcc -static -Wall -g test_libarchive.o libArchive_wrapper.o -Llibarchive_build/libarchive/ -larchive -lz -lbz2 -lBcrypt -lpthread -liconv -o test_libarchive_static
+if [[ $(uname) == MINGW* ]]; then
+    gcc -static -Wall -g test_libarchive.o libArchive_wrapper.o -Llibarchive_build/libarchive/ -larchive -lz -lbz2 -lBcrypt -lpthread -liconv -o test_libarchive_static
+else
+    gcc -static -Wall -g test_libarchive.o libArchive_wrapper.o -Llibarchive_build/libarchive/ -larchive -lz -lpthread -o test_libarchive_static
+fi
 
 ./test_libarchive_static
 
