@@ -5,6 +5,10 @@
 #include <sys/stat.h>
 #include <unistd.h> //unlink
 
+#if defined(_WIN32)
+#include <windows.h>
+#endif
+
 #include "libArchive_wrapper.h"
 
 int main(int argc, char** argv){
@@ -29,7 +33,11 @@ int main(int argc, char** argv){
   int status;
   if (stat("tmpdir", &st) != 0) {
     printf("Creating tmpdir\n");
+#if defined(_WIN32)
+    status = CreateDirectory("tmpdir",NULL);
+#else
     status = mkdir("tmpdir",S_IRWXU);
+#endif
     if (status){
       printf("Something went wrong when creating tmpdir. Sorry!");
       exit(1);
