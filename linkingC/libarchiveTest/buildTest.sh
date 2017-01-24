@@ -22,7 +22,8 @@ echo
 #Build static test_libarchive:
 echo "Building test_libarchive_static..."
 set -o verbose -o xtrace
-gcc -static -Wall -g test_libarchive.c libArchive_wrapper.o libarchive_build/libarchive/libarchive.a -lz -lpthread -o test_libarchive_static
+gcc -Wall -g -c test_libarchive.c
+gcc -static -Wall -g test_libarchive.o libArchive_wrapper.o -Llibarchive_build/libarchive/ -larchive -lz -lbz2 -lBcrypt -lpthread -liconv -o test_libarchive_static
 
 ./test_libarchive_static
 
