@@ -84,4 +84,26 @@ int main(int argc, char** argv){
   free(filesToCompress[1]);
   free(filesToCompress[2]);
   free(filesToCompress);
+
+  //Unzip Sixin.zip
+  if (stat("sixin_dir", &st) != 0) {
+    printf("Creating sixin_dir\n");
+#if defined(_WIN32)
+    status = CreateDirectory("sixin_dir",NULL);
+#else
+    status = mkdir("sixin_dir",S_IRWXU);
+#endif
+    if (status){
+      printf("Something went wrong when creating sixin_dir. Sorry!");
+      exit(1);
+    }
+  }
+  else if (stat("sixin_dir", &st) == 0 && ! S_ISDIR(st.st_mode)) {
+    printf("sixin_dir exists, but is not a directory. You fix it!\n");
+    exit(1);
+  }
+
+  read_archive("Sixin.zip", "sixin_dir");
+  
+
 }
