@@ -14,18 +14,22 @@ C     Read command line arguments
          stop 1
       endif
       call getarg(1,arg)
-      if ( len(trim(arg)) .ne. 1) then
-         call USAGE
-         stop 2
-      endif
+c$$$      if ( len(trim(arg)) .ne. 1) then
+c$$$         call USAGE
+c$$$         stop 2
+c$$$      endif
 
-      select case (arg(1:1))
+      select case (arg)
       case ("W")
          call WRITE
       case ("L")
          call LIST
       case ("R")
          call READ
+      case ("L2")
+         call LIST2
+      case ("R2")
+         call READ2
       case default
          call USAGE
          stop 3
@@ -39,6 +43,8 @@ C     Read command line arguments
          write(*,*) "  W: Create/write the archive"
          write(*,*) "  L: List the archive"
          write(*,*) "  R: Read the archive"
+         write(*,*) "  L2: List the archive (Sixin.zip)"
+         write(*,*) "  R2: Read the archive (Sixin.zip)"
       end subroutine
 
       subroutine WRITE
@@ -65,5 +71,19 @@ C     Read command line arguments
       write(*,*) "Reading!"
       FLUSH(6)
       call f_read_archive("tmpdir/test.zip","tmpdir")
+      write(*,*) "Done"
+      end subroutine
+
+      subroutine LIST2
+      write(*,*) "Listing Sixin.zip!"
+      FLUSH(6)
+      call f_list_archive("Sixin.zip")
+      write(*,*) "Done"
+      end subroutine
+
+      subroutine READ2
+      write(*,*) "Reading Sixin.zip!"
+      FLUSH(6)
+      call f_read_archive("Sixin.zip","sixin_dir")
       write(*,*) "Done"
       end subroutine

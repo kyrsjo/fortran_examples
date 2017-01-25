@@ -70,4 +70,11 @@ rm tmpdir/README tmpdir/buildTest.sh tmpdir/buildLibArchive.sh
 ./test_libarchive_fortran_static R
 ls tmpdir
 
+./test_libarchive_fortran_static L2
+
+ls sixin_dir
+rm sixin_dir/*
+./test_libarchive_fortran_static R2
+ls -lh sixin_dir
+
 set +o verbose +o xtrace
